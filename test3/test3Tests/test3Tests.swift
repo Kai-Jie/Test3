@@ -10,16 +10,9 @@ import XCTest
 
 class test3Tests: XCTestCase {
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
     func testXXX() throws {
-        let viewModel = ViewModel()
+        let service = MockService()
+        let viewModel = ViewModel(apiServer: service)
         
         let expectation = expectation(description: "test")
         
@@ -27,17 +20,25 @@ class test3Tests: XCTestCase {
             
             expectation.fulfill()
         }
-        
+
+        service.completeResponse()
+
         wait(for: [expectation], timeout: 5)
         print(viewModel.testModel.count)
-        XCTAssert(viewModel.testModel.count == 1)
-    }
-    
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        measure {
-            // Put the code you want to measure the time of here.
-        }
+        XCTAssertEqual(viewModel.testModel.count, 1)
     }
 
+    private class MockService: APIServiceType {
+        var response: (()->())?
+
+        func webAPI() {
+            response = {
+                NotificationCenter.default.post(name:Notification.Name(rawValue:"TestNotificationName"), object: self)
+            }
+        }
+
+        func completeResponse() {
+            response?()
+        }
+    }
 }
