@@ -10,7 +10,6 @@ import Foundation
 class ViewModel: ObservableObject {
     @Published var testModel:[Model] = []
     let apiServer: APIServiceType
-    
     init(apiServer: APIServiceType = APIService.shareInstance)
     {
         self.apiServer = apiServer
@@ -25,8 +24,18 @@ class ViewModel: ObservableObject {
     }
     
     @objc func testHandler(_ notification: Notification) {
-        DispatchQueue.main.async {
+        guaranteeMainThread {
             self.testModel.append(Model())
+        }
+    }
+}
+
+private func guaranteeMainThread(_ work: @escaping ()->()) {
+    if Thread.isMainThread {
+        work()
+    } else {
+        DispatchQueue.main.async {
+            work()
         }
     }
 }

@@ -11,7 +11,8 @@ import XCTest
 class test3Tests: XCTestCase {
 
     func testXXX() throws {
-        let viewModel = ViewModel()
+        let service = MockService()
+        let viewModel = ViewModel(apiServer: service)
         
         let expectation = expectation(description: "test")
         
@@ -19,10 +20,25 @@ class test3Tests: XCTestCase {
             
             expectation.fulfill()
         }
-        
+
+        service.completeResponse()
+
         wait(for: [expectation], timeout: 5)
         print(viewModel.testModel.count)
-        XCTAssert(viewModel.testModel.count == 1)
+        XCTAssertEqual(viewModel.testModel.count, 1)
     }
 
+    private class MockService: APIServiceType {
+        var response: (()->())?
+
+        func webAPI() {
+            response = {
+                NotificationCenter.default.post(name:Notification.Name(rawValue:"TestNotificationName"), object: self)
+            }
+        }
+
+        func completeResponse() {
+            response?()
+        }
+    }
 }
