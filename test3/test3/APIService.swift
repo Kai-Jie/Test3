@@ -7,7 +7,11 @@
 
 import Foundation
 
-class APIService
+protocol APIServiceType {
+    func webAPI()
+}
+
+class APIService: APIServiceType
 {
     static let shareInstance = APIService()
     

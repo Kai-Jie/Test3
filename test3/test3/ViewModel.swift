@@ -9,10 +9,11 @@ import Foundation
 
 class ViewModel: ObservableObject {
     @Published var testModel:[Model] = []
-    let apiServer = APIService.shareInstance
+    let apiServer: APIServiceType
     
-    init()
+    init(apiServer: APIServiceType = APIService.shareInstance)
     {
+        self.apiServer = apiServer
         NotificationCenter.default.addObserver(self, selector: #selector(testHandler), name:Notification.Name(rawValue:"TestNotificationName"), object:apiServer)
         
         loadData()
